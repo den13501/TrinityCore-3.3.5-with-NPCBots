@@ -42,6 +42,7 @@
 #	 SOLOCRAFT
 #	 SKIP DEATH KNIGHT STARTING AREA
 #	 PAYMASTER
+#	 DUNGEON STATS
 #
 ###################################################################################################
 
@@ -5289,4 +5290,33 @@ Paymaster.Announce.Enable = 1
 Paymaster.AddGold = 5000
 
 #
-###################################################################################################
+################STATSCAP##########################################################################
+# 32767 stats cap 
+#	Default : true (Stats Cap 32767 Enable)
+Stats.Cap = true
+################DungeonStatsReward#################################################################
+#Gain a random stat for killing Dungeon Bosses and eLites.
+#(Agility,Intellect,Strength,Stamina,Spirit,Spell Power,AttackPower, and Ranged Attack Power)
+#
+DungeonStatsReward.Enable = true
+#
+DungeonStatsReward.Elite.NPCs = true
+DungeonStatsReward.Normal.NPCs = true
+#
+#Chance for an NPC to give a stat on kill. (Boss will always give a stat)
+#100 = 100%, 50 = 50%, 1 = 1%. Max 100.
+#
+DungeonStatsReward.Chance = 1000
+#
+#Random 1-# (Default 5) would give 1-5 points of the stat.
+#
+DungeonStatsReward.AmountBoss  = 5
+#
+DungeonStatsReward.AmountElite  = 5
+#
+DungeonStatsReward.AmountNormal = 1
+#
+#Pets will also get the points player gained
+DungeonStatsReward.Pets  = true
+#
+#################################################################################################
