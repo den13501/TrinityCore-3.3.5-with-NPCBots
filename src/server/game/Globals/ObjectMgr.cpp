@@ -20,6 +20,7 @@
 #include "ArenaTeamMgr.h"
 #include "Bag.h"
 #include "Chat.h"
+#include "Config.h"
 #include "Containers.h"
 #include "CreatureAIFactory.h"
 #include "DatabaseEnv.h"
