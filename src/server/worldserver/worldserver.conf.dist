@@ -5306,7 +5306,7 @@ DungeonStatsReward.Normal.NPCs = true
 #Chance for an NPC to give a stat on kill. (Boss will always give a stat)
 #100 = 100%, 50 = 50%, 1 = 1%. Max 100.
 #
-DungeonStatsReward.Chance = 1000
+DungeonStatsReward.Chance = 100
 #
 #Random 1-# (Default 5) would give 1-5 points of the stat.
 #
