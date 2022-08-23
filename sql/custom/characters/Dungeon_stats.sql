@@ -10,13 +10,12 @@ DROP TABLE IF EXISTS `stats_from_dungeons`;
 
 CREATE TABLE `stats_from_dungeons` (
   `GUID` int(10) unsigned NOT NULL,
+  `Strength` float NOT NULL DEFAULT '0',
   `Agility` float NOT NULL DEFAULT '0',
+  `Stamina` float NOT NULL DEFAULT '0',
   `Intellect` float NOT NULL DEFAULT '0',
   `Spirit` float NOT NULL DEFAULT '0',
-  `Strength` float NOT NULL DEFAULT '0',
-  `Stamina` float NOT NULL DEFAULT '0',
-  `HealingBonus` int(11) unsigned NOT NULL DEFAULT '0',
-  `SpellDBonus` int(11) unsigned NOT NULL DEFAULT '0',
+  `SpellPower` int(11) unsigned NOT NULL DEFAULT '0',
   `AttackPower` float NOT NULL DEFAULT '0',
   `RAttackPower` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`GUID`)

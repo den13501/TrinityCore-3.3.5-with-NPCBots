@@ -2990,26 +2990,26 @@ void Player::InitStatsForLevel(bool reapplyMods)
 	
 if (sConfigMgr->GetBoolDefault("DungeonStatsReward.Enable", true))
 		{
-QueryResult Dungeonstatsresult = CharacterDatabase.PQuery("SELECT `Agility`, `Intellect`, `Spirit`, `Strength`, `Stamina`, `HealingBonus`, `SpellDBonus`,`AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
+QueryResult Dungeonstatsresult = CharacterDatabase.PQuery("SELECT `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`, `SpellPower`, `AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
 	//skulystats
 	if (!Dungeonstatsresult)
 			{
-				CharacterDatabase.PExecute("INSERT INTO `stats_from_dungeons` (GUID) VALUES (%u)", GetGUID());
+				CharacterDatabase.DirectPExecute("INSERT INTO `stats_from_dungeons` (GUID) VALUES (%u)", GetGUID());
 			}
 	else
-{			
-	HandleStatFlatModifier(UnitMods(STAT_AGILITY), TOTAL_VALUE, (*Dungeonstatsresult)[0].GetFloat(), true);
-	HandleStatFlatModifier(UnitMods(STAT_INTELLECT), TOTAL_VALUE, (*Dungeonstatsresult)[1].GetFloat(), true);
-	HandleStatFlatModifier(UnitMods(STAT_SPIRIT), TOTAL_VALUE, (*Dungeonstatsresult)[2].GetFloat(), true);
-	HandleStatFlatModifier(UnitMods(STAT_STRENGTH), TOTAL_VALUE, (*Dungeonstatsresult)[3].GetFloat(), true);
-	HandleStatFlatModifier(UnitMods(STAT_STAMINA), TOTAL_VALUE, (*Dungeonstatsresult)[4].GetFloat(), true);
-	HandleStatFlatModifier(UnitMods(UNIT_MOD_ATTACK_POWER), TOTAL_VALUE, (*Dungeonstatsresult)[7].GetFloat(), true);
-	HandleStatFlatModifier(UnitMods(UNIT_MOD_ATTACK_POWER_RANGED), TOTAL_VALUE, (*Dungeonstatsresult)[8].GetFloat(), true);
-	
+{
 
+	HandleStatFlatModifier(UnitMods(STAT_STRENGTH), TOTAL_VALUE, (*Dungeonstatsresult)[0].GetFloat(), true);
+	HandleStatFlatModifier(UnitMods(STAT_AGILITY), TOTAL_VALUE, (*Dungeonstatsresult)[1].GetFloat(), true);
+	HandleStatFlatModifier(UnitMods(STAT_STAMINA), TOTAL_VALUE, (*Dungeonstatsresult)[2].GetFloat(), true);
+	HandleStatFlatModifier(UnitMods(STAT_INTELLECT), TOTAL_VALUE, (*Dungeonstatsresult)[3].GetFloat(), true);
+	HandleStatFlatModifier(UnitMods(STAT_SPIRIT), TOTAL_VALUE, (*Dungeonstatsresult)[4].GetFloat(), true);
+	ApplySpellPowerBonus(int32((*Dungeonstatsresult)[5].GetUInt32()), true);
+	HandleStatFlatModifier(UnitMods(UNIT_MOD_ATTACK_POWER), TOTAL_VALUE, (*Dungeonstatsresult)[6].GetFloat(), true);
+	HandleStatFlatModifier(UnitMods(UNIT_MOD_ATTACK_POWER_RANGED), TOTAL_VALUE, (*Dungeonstatsresult)[7].GetFloat(), true);
 
-}		
-			
+}
+
 		}
 
     // update level to hunter/summon pet
@@ -16686,24 +16686,29 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 								std::ostringstream ss;
 								std::ostringstream ss2;
 								float amount;
-								
+
 						if (Creature* victim = killed->ToCreature())
 							{
 										int nonbossroll = irand(1, 100);
 										int percentage = sConfigMgr->GetIntDefault("DungeonStatsReward.Chance", 0);
-										
+
 										if (percentage > 100)
 										{
 											percentage = 100;
 										}
-										
+
+										if (percentage < 1)
+										{
+											percentage = 1;
+										}
+
 										if (((nonbossroll <= percentage && !victim->IsDungeonBoss()) || victim->IsDungeonBoss()) && isDungeon)
 										{
-											
+
 										if ((victim->isElite() && sConfigMgr->GetBoolDefault("DungeonStatsReward.Elite.NPCs", true)) || (!victim->isElite() && sConfigMgr->GetBoolDefault("DungeonStatsReward.Normal.NPCs", true)) || victim->IsDungeonBoss())
 										{
-										QueryResult GDungeonstatsresult = CharacterDatabase.PQuery("SELECT `Agility`, `Intellect`, `Spirit`, `Strength`, `Stamina`, `HealingBonus`, `SpellDBonus`,`AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
-										
+										QueryResult GDungeonstatsresult = CharacterDatabase.PQuery("SELECT `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`, `SpellPower`, `AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
+
 										if (victim->isElite())
 										{
 										amount = sConfigMgr->GetFloatDefault("DungeonStatsReward.AmountElite", 1.0f);
@@ -16716,156 +16721,131 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 										{
 										amount = sConfigMgr->GetFloatDefault("DungeonStatsReward.AmountNormal", 1.0f);
 										}
-										
+
+										if (amount < 1.0f)
+										{
+											amount = 1.0f;
+										}
 										int memberguid = GetGUID();
 										float Rollpoints = irand(1.0f, amount );
-										//int SPRollpoints = static_cast<int>(Rollpoints);
-										int chatpoints = static_cast<int>(Rollpoints);
 
-										int Rollstat = irand(1, 9);
+										int chatpoints = int(Rollpoints);
 
-											float GQAgilityDB = (*GDungeonstatsresult)[0].GetFloat();
-											float GQIntellectDB = (*GDungeonstatsresult)[1].GetFloat();
-											float GQSpiritDB = (*GDungeonstatsresult)[2].GetFloat();
-											float GQStrengthDB = (*GDungeonstatsresult)[3].GetFloat();
-											float GQStaminaDB = (*GDungeonstatsresult)[4].GetFloat();
-											int GQHealDB = (*GDungeonstatsresult)[5].GetUInt32();
-											int GQSpellDB = (*GDungeonstatsresult)[6].GetUInt32();
-											float GQAPDB = (*GDungeonstatsresult)[7].GetFloat();
-											float GQRAPDB = (*GDungeonstatsresult)[8].GetFloat();
+										int Rollstat = irand(1, 8);
+
+
+
+											float GQStrengthDB = (*GDungeonstatsresult)[0].GetFloat();
+											float GQAgilityDB = (*GDungeonstatsresult)[1].GetFloat();
+											float GQStaminaDB = (*GDungeonstatsresult)[2].GetFloat();
+											float GQIntellectDB = (*GDungeonstatsresult)[3].GetFloat();
+											float GQSpiritDB = (*GDungeonstatsresult)[4].GetFloat();
+
+
+											uint32 GQSpellDB = (*GDungeonstatsresult)[5].GetUInt32();
+											float GQAPDB = (*GDungeonstatsresult)[6].GetFloat();
+											float GQRAPDB = (*GDungeonstatsresult)[7].GetFloat();
 											float DBValue;
+											uint32 DBUintValue;
 
 											std::ostringstream ss;
 											std::string statchosen;
 											if (Rollstat == 1)
 											{
-											statchosen = "Agility";
-											DBValue = GQAgilityDB;
-											ss << "You gained|cffFF8000 %i |rAgility.";
-											}
-											if (Rollstat == 2)
-											{
-											statchosen = "Intellect";
-											DBValue = GQIntellectDB;
-											ss << "You gained|cffFF8000 %i |rIntellect.";
-											}
-											if (Rollstat == 3)
-											{
-											statchosen = "Spirit";
-											DBValue = GQSpiritDB;
-											ss << "You gained|cffFF8000 %i |rSpirit.";
-											}
-											if (Rollstat == 4)
-											{
 											statchosen = "Strength";
 											DBValue = GQStrengthDB;
 											ss << "You gained|cffFF8000 %i |rStrength.";
 											}
-											if (Rollstat == 5)
+											if (Rollstat == 2)
+											{
+											statchosen = "Agility";
+											DBValue = GQAgilityDB;
+											ss << "You gained|cffFF8000 %i |rAgility.";
+											}
+											if (Rollstat == 3)
 											{
 											statchosen = "Stamina";
 											DBValue = GQStaminaDB;
 											ss << "You gained|cffFF8000 %i |rStamina.";
 											}
+											if (Rollstat == 4)
+											{
+											statchosen = "Intellect";
+											DBValue = GQIntellectDB;
+											ss << "You gained|cffFF8000 %i |rIntellect.";
+											}
+											if (Rollstat == 5)
+											{
+											statchosen = "Spirit";
+											DBValue = GQSpiritDB;
+											ss << "You gained|cffFF8000 %i |rSpirit.";
+											}
 											if (Rollstat == 6)
 											{
-											statchosen = "HealingBonus";
-											DBValue = GQHealDB;
-											DBValue = static_cast<int>(DBValue);
-											ss << "You gained|cffFF8000 %i |rBonus Healing.";
+											statchosen = "SpellPower";
+											DBUintValue = GQSpellDB;
+											ss << "You gained|cffFF8000 %i |rSpell Power.";
 											}
 											if (Rollstat == 7)
-											{
-											statchosen = "SpellDBonus";
-											DBValue = GQSpellDB;
-											DBValue = static_cast<int>(DBValue);
-											ss << "You gained|cffFF8000 %i |rBonus Spell Damage.";
-											}
-											if (Rollstat == 8)
 											{
 											statchosen = "AttackPower";
 											DBValue = GQAPDB;
 											ss << "You gained|cffFF8000 %i |rAttack Power.";
 											}
-											if (Rollstat == 9)
+											if (Rollstat == 8)
 											{
 											statchosen = "RAttackPower";
 											DBValue = GQRAPDB;
 											ss << "You gained|cffFF8000 %i |rRanged Attack Power.";
 											}
-											CharacterDatabase.PExecute("UPDATE `stats_from_dungeons` SET %s = %f WHERE GUID = %u", statchosen, DBValue + Rollpoints, memberguid);
+											if (Rollstat < 6 || Rollstat > 6)
+											{CharacterDatabase.DirectPExecute("UPDATE `stats_from_dungeons` SET %s = %f WHERE GUID = %u", statchosen, DBValue + Rollpoints, memberguid);}
+											else
+											{CharacterDatabase.DirectPExecute("UPDATE `stats_from_dungeons` SET %s = %u WHERE GUID = %u", statchosen, DBUintValue + uint32(Rollpoints), memberguid);}
 											ChatHandler(GetSession()).PSendSysMessage(ss.str().c_str(), chatpoints);
-											
-		QueryResult Dungeonstatsresult2 = CharacterDatabase.PQuery("SELECT `Agility`, `Intellect`, `Spirit`, `Strength`, `Stamina`, `HealingBonus`, `SpellDBonus`,`AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
-											
+
+											QueryResult Dungeonstatsresult = CharacterDatabase.PQuery("SELECT `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`, `SpellPower`, `AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
 											if (Rollstat == 1)
 											{
-											DBValue = (*Dungeonstatsresult2)[0].GetFloat() + Rollpoints;
-											float value = GetTotalStatValue(STAT_AGILITY) + DBValue;
-											SetStat(STAT_AGILITY, int32(value));
+											HandleStatFlatModifier(UnitMods(STAT_STRENGTH), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 2)
 											{
-											DBValue = (*Dungeonstatsresult2)[1].GetFloat() + Rollpoints;
-											float value = GetTotalStatValue(STAT_INTELLECT) + DBValue;
-											SetStat(STAT_INTELLECT, int32(value));
+											HandleStatFlatModifier(UnitMods(STAT_AGILITY), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 3)
 											{
-											DBValue = (*Dungeonstatsresult2)[2].GetFloat() + Rollpoints;
-											float value = GetTotalStatValue(STAT_SPIRIT) + DBValue;
-											SetStat(STAT_SPIRIT, int32(value));
+											HandleStatFlatModifier(UnitMods(STAT_STAMINA), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 4)
 											{
-											DBValue = (*Dungeonstatsresult2)[3].GetFloat() + Rollpoints;
-											float value = GetTotalStatValue(STAT_STRENGTH) + DBValue;
-											SetStat(STAT_STRENGTH, int32(value));
+											HandleStatFlatModifier(UnitMods(STAT_INTELLECT), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 5)
 											{
-											DBValue = (*Dungeonstatsresult2)[4].GetFloat() + Rollpoints;
-											float value = GetTotalStatValue(STAT_STAMINA) + DBValue;
-											SetStat(STAT_STAMINA, int32(value));
+											HandleStatFlatModifier(UnitMods(STAT_SPIRIT), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 6)
 											{
-											DBValue = (*Dungeonstatsresult2)[5].GetUInt32() + Rollpoints;
-											float value = SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_ALL) + DBValue;
-											SetStatInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, int32(value));
+											ApplySpellPowerBonus(Rollpoints, true);
 											}
 											if (Rollstat == 7)
 											{
-											DBValue = (*Dungeonstatsresult2)[6].GetUInt32() + Rollpoints;
-											Unit::AuraEffectList const& modDamageAuras = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_DONE);
-											for (uint16 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-											{
-												SetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + i, std::accumulate(modDamageAuras.begin(), modDamageAuras.end(), 0, [i](int32 negativeMod, AuraEffect const* aurEff)
-												{
-													if (aurEff->GetAmount() < 0 && aurEff->GetMiscValue() & (1 << i))
-														negativeMod += aurEff->GetAmount();
-													return negativeMod;
-												}));
-												SetStatInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, (SpellBaseDamageBonusDone(SpellSchoolMask(1 << i)) + int32(DBValue)) - GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + i));
-											}
-											}
-											if (Rollstat == 8)
-											{
 											HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, Rollpoints, true);
 											}
-											if (Rollstat == 9)
+											if (Rollstat == 8)
 											{
 											HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, Rollpoints, true);
 											}
 										}
-										
-								 
+
+
 							}
-							
 					}
-			
-			
+
+
     }
+
 }
 
 void Player::KilledPlayerCredit(uint16 count)
