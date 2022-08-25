@@ -47,6 +47,8 @@
 #	 ICC GUNSHIP HEALTH
 #	 POTIONS IN COMBAT
 #	 HUNTER AMMO
+#	 CUSTOMATTACKSPEED
+#	 PLAYTIMEREWARD
 #
 ###################################################################################################
 
@@ -5171,4 +5173,21 @@ Potions.Limit = true
 # Prevent Hunter's ranged weapons from taking ammo when used 
 # 1 -(will use ammo) 0 - (disables ammo usage)
 Ammo.TakeAmmo = 1
-###################################################################################################
+#############CUSTOMATTACKSPEED####################################################################
+#     Custom.AttackSpeedForPlayer
+#     Custom.AttackSpeedForMobs
+#         Set it to a number upper than 1 to speed up the attack of the player or the mobs
+#     Default : 1.0 (Normal speed)
+#     Example : 2.0 (attack speed is 200% faster)
+#     Example : 0.5 (attack speed is 50% slower)
+Custom.AttackSpeedForPlayer = 1.0
+Custom.AttackSpeedForMobs = 1.0
+#
+############PLAYTIMEREWARD########################################################################
+# PlayedTimeReward.Money is copper so 10000 copper is 1 gold.
+PlayedTimeReward.Interval = 10000
+PlayedTimeReward.Money    = 1
+PlayedTimeReward.Honor    = 1
+PlayedTimeReward.Arena    = 1
+#
+##################################################################################################
