@@ -19,9 +19,6 @@
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
-void AddLfgSoloScripts();
-void AddSC_skip_StarterArea();
-void AddSolocraftScripts();
 // 1
 // 2
 // 3
@@ -62,6 +59,9 @@ void AddSolocraftScripts();
 // 38
 // 39
 // 40
+void AddLfgSoloScripts();
+void AddSC_skip_StarterArea();
+void AddSolocraftScripts();
 void Add_paymaster_npc();
 
 void AddCustomScripts()
@@ -109,4 +109,5 @@ void AddCustomScripts()
 	AddLfgSoloScripts();
 	AddSC_skip_StarterArea();
 	AddSolocraftScripts();
+	Add_paymaster_npc();
 }

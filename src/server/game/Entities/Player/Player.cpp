@@ -16747,7 +16747,7 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 											float GQRAPDB = (*GDungeonstatsresult)[7].GetFloat();
 											float DBValue;
 											uint32 DBUintValue;
-
+											QueryResult Dungeonstatsresult = CharacterDatabase.PQuery("SELECT `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`, `SpellPower`, `AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
 											std::ostringstream ss;
 											std::string statchosen;
 											if (Rollstat == 1)
@@ -16755,88 +16755,64 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 											statchosen = "Strength";
 											DBValue = GQStrengthDB;
 											ss << "You gained|cffFF8000 %i |rStrength.";
+											HandleStatFlatModifier(UnitMods(STAT_STRENGTH), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 2)
 											{
 											statchosen = "Agility";
 											DBValue = GQAgilityDB;
 											ss << "You gained|cffFF8000 %i |rAgility.";
+											HandleStatFlatModifier(UnitMods(STAT_AGILITY), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 3)
 											{
 											statchosen = "Stamina";
 											DBValue = GQStaminaDB;
 											ss << "You gained|cffFF8000 %i |rStamina.";
+											HandleStatFlatModifier(UnitMods(STAT_STAMINA), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 4)
 											{
 											statchosen = "Intellect";
 											DBValue = GQIntellectDB;
 											ss << "You gained|cffFF8000 %i |rIntellect.";
+											HandleStatFlatModifier(UnitMods(STAT_INTELLECT), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 5)
 											{
 											statchosen = "Spirit";
 											DBValue = GQSpiritDB;
 											ss << "You gained|cffFF8000 %i |rSpirit.";
+											HandleStatFlatModifier(UnitMods(STAT_SPIRIT), TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 6)
 											{
 											statchosen = "SpellPower";
 											DBUintValue = GQSpellDB;
 											ss << "You gained|cffFF8000 %i |rSpell Power.";
+											ApplySpellPowerBonus(Rollpoints, true);
+											{CharacterDatabase.DirectPExecute("UPDATE `stats_from_dungeons` SET %s = %u WHERE GUID = %u", statchosen, DBUintValue + uint32(Rollpoints), memberguid);}
 											}
 											if (Rollstat == 7)
 											{
 											statchosen = "AttackPower";
 											DBValue = GQAPDB;
 											ss << "You gained|cffFF8000 %i |rAttack Power.";
+											HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, Rollpoints, true);
 											}
 											if (Rollstat == 8)
 											{
 											statchosen = "RAttackPower";
 											DBValue = GQRAPDB;
 											ss << "You gained|cffFF8000 %i |rRanged Attack Power.";
-											}
-											if (Rollstat < 6 || Rollstat > 6)
-											{CharacterDatabase.DirectPExecute("UPDATE `stats_from_dungeons` SET %s = %f WHERE GUID = %u", statchosen, DBValue + Rollpoints, memberguid);}
-											else
-											{CharacterDatabase.DirectPExecute("UPDATE `stats_from_dungeons` SET %s = %u WHERE GUID = %u", statchosen, DBUintValue + uint32(Rollpoints), memberguid);}
-											ChatHandler(GetSession()).PSendSysMessage(ss.str().c_str(), chatpoints);
-
-											QueryResult Dungeonstatsresult = CharacterDatabase.PQuery("SELECT `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`, `SpellPower`, `AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
-											if (Rollstat == 1)
-											{
-											HandleStatFlatModifier(UnitMods(STAT_STRENGTH), TOTAL_VALUE, Rollpoints, true);
-											}
-											if (Rollstat == 2)
-											{
-											HandleStatFlatModifier(UnitMods(STAT_AGILITY), TOTAL_VALUE, Rollpoints, true);
-											}
-											if (Rollstat == 3)
-											{
-											HandleStatFlatModifier(UnitMods(STAT_STAMINA), TOTAL_VALUE, Rollpoints, true);
-											}
-											if (Rollstat == 4)
-											{
-											HandleStatFlatModifier(UnitMods(STAT_INTELLECT), TOTAL_VALUE, Rollpoints, true);
-											}
-											if (Rollstat == 5)
-											{
-											HandleStatFlatModifier(UnitMods(STAT_SPIRIT), TOTAL_VALUE, Rollpoints, true);
-											}
-											if (Rollstat == 6)
-											{
-											ApplySpellPowerBonus(Rollpoints, true);
-											}
-											if (Rollstat == 7)
-											{
-											HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, Rollpoints, true);
-											}
-											if (Rollstat == 8)
-											{
 											HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, Rollpoints, true);
 											}
+											if (Rollstat != 6)
+											{
+											{CharacterDatabase.DirectPExecute("UPDATE `stats_from_dungeons` SET %s = %f WHERE GUID = %u", statchosen, DBValue + Rollpoints, memberguid);}
+											}
+											
+											ChatHandler(GetSession()).PSendSysMessage(ss.str().c_str(), chatpoints);
 										}
 
 
@@ -22397,9 +22373,12 @@ void Player::UpdatePvP(bool state, bool _override)
 
 void Player::UpdatePotionCooldown(Spell* spell)
 {
-    // no potion used i combat or still in combat
-    if (!m_lastPotionId || IsInCombat())
-        return;
+    // no potion used in combat or still in combat
+    //if (!m_lastPotionId || IsInCombat())
+        //return;
+	if (sWorld->getBoolConfig(CONFIG_POTIONS_LIMIT))
+		if (!m_lastPotionId || IsInCombat())
+       return;
 
     // Call not from spell cast, send cooldown event for item spells if no in combat
     if (!spell)

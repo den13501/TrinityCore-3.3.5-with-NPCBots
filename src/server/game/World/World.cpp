@@ -592,10 +592,16 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_ARENA_POINTS] = sConfigMgr->GetFloatDefault("Rate.ArenaPoints", 1.0f);
     rate_values[RATE_INSTANCE_RESET_TIME] = sConfigMgr->GetFloatDefault("Rate.InstanceResetTime", 1.0f);
     rate_values[RATE_TALENT] = sConfigMgr->GetFloatDefault("Rate.Talent", 1.0f);
+	rate_values[RATE_TALENT_PET] = sConfigMgr->GetFloatDefault("Rate.Talent.Pet", 1.0f);
     if (rate_values[RATE_TALENT] < 0.0f)
     {
         TC_LOG_ERROR("server.loading", "Rate.Talent (%f) must be > 0. Using 1 instead.", rate_values[RATE_TALENT]);
         rate_values[RATE_TALENT] = 1.0f;
+    }
+	if (rate_values[RATE_TALENT_PET] < 0.0f)
+    {
+        TC_LOG_ERROR("server.loading", "Rate.Talent.Pet (%f) must be > 0. Using 1 instead.", rate_values[RATE_TALENT_PET]);
+        rate_values[RATE_TALENT_PET] = 1.0f;
     }
     rate_values[RATE_MOVESPEED] = sConfigMgr->GetFloatDefault("Rate.MoveSpeed", 1.0f);
     if (rate_values[RATE_MOVESPEED] < 0)
@@ -1548,6 +1554,9 @@ void World::LoadConfigSettings(bool reload)
 
     // Specifies if IP addresses can be logged to the database
     m_bool_configs[CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE] = sConfigMgr->GetBoolDefault("AllowLoggingIPAddressesInDatabase", true, true);
+	
+	//allow use of Potions more than once in combat.
+	m_bool_configs[CONFIG_POTIONS_LIMIT] = sConfigMgr->GetBoolDefault("Potions.Limit", true);
 
     // call ScriptMgr if we're reloading the configuration
     if (reload)

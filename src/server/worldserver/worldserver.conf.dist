@@ -45,6 +45,8 @@
 #	 PAYMASTER
 #	 DUNGEON STATS
 #	 ICC GUNSHIP HEALTH
+#	 POTIONS IN COMBAT
+#	 HUNTER AMMO
 #
 ###################################################################################################
 
@@ -2425,6 +2427,13 @@ Rate.ArenaPoints = 1
 #        Default:     1
 
 Rate.Talent = 1
+
+#
+#    Rate.Talent.Pet
+#        Description: Talent point rate of a Hunter's Pet.
+#        Default:     1
+
+Rate.Talent.Pet = 1
 
 #
 #    Rate.Reputation.Gain
@@ -5152,4 +5161,14 @@ DungeonStatsReward.Pets  = true
 # Gunship HP 0.2 = 20% 0.5 = 50% 0.75 = 75%
 # Default: 1 (100%)
 GunshipHP = 1
-#################################################################################################
+####################################################################################################
+#POTIONS IN COMBAT
+# true = can only use one potion while in combat
+# false = can use potions again in combat
+Potions.Limit = true
+####################################################################################################
+#HUNTER AMMO
+# Prevent Hunter's ranged weapons from taking ammo when used 
+# 1 -(will use ammo) 0 - (disables ammo usage)
+Ammo.TakeAmmo = 1
+###################################################################################################
