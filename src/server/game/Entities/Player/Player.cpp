@@ -25249,8 +25249,16 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
     if (!item || item->is_looted)
     {
-        SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
-        return;
+        if (sConfigMgr->GetBoolDefault("AOE.LOOT.enable", true))
+        {
+            //SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr); prevents error already loot from spamming
+            return;
+        }
+        else
+        {
+            SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
+            return;
+        }
     }
 
     if (!item->AllowedForPlayer(this))
@@ -26724,14 +26732,16 @@ void Player::SendRefundInfo(Item* item)
     SendDirectMessage(&data);
 }
 
-bool Player::AddItem(uint32 itemId, uint32 count)
+bool Player::AddItem(uint32 itemId, uint32 count, InventoryResult* error)
 {
     uint32 noSpaceForCount = 0;
     ItemPosCountVec dest;
     InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
     if (msg != EQUIP_ERR_OK)
         count -= noSpaceForCount;
-
+		if (error)
+        *error = msg;
+	
     if (count == 0 || dest.empty())
     {
         /// @todo Send to mailbox if no space

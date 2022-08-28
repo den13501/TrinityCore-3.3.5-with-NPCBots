@@ -49,6 +49,7 @@
 #	 HUNTER AMMO
 #	 CUSTOMATTACKSPEED
 #	 PLAYTIMEREWARD
+#	 AOE LOOTING
 #
 ###################################################################################################
 
@@ -5185,9 +5186,48 @@ Custom.AttackSpeedForMobs = 1.0
 #
 ############PLAYTIMEREWARD########################################################################
 # PlayedTimeReward.Money is copper so 10000 copper is 1 gold.
-PlayedTimeReward.Interval = 10000
+PlayedTimeReward.Interval = 60000
 PlayedTimeReward.Money    = 1
 PlayedTimeReward.Honor    = 1
 PlayedTimeReward.Arena    = 1
 #
 ##################################################################################################
+#AOE Looting and Mail Excess to Player#
+#######################################
+#
+#    AOE Looting and Mail Excess
+#        Enable this if you want to enable Area of effect with looting (MOP Feature)
+#        Excess items that is looted in will be mailed to the player
+#
+#    AOE.LOOT.enable
+#         Description: Enables Module
+#         Default:    false - (Disabled)
+#                     true - (Enabled)
+
+AOE.LOOT.enable = false
+
+#    AOE.LOOT.enable.group
+#         Description: Enables AOE Loot work while in group. 
+#		  (This will cause problems if you are grouped with real players but playing solo with bots should work fine.
+#			I suggest only enable if you no other players will be playing on your server)
+#         Default:    false - (Disabled)
+#					  true - (Enabled)
+
+AOE.LOOT.enable.group = false
+
+#    AOE.MAIL.filter
+#         Description: Filter out items that cannot be stored and do not mail them
+#         Example:    "17,10" - (EQUIP_ERR_CANT_CARRY_MORE_OF_THIS,
+#                                EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM)
+#         Default:    "" - (Disabled)
+
+AOE.MAIL.filter = "17,10"
+
+#         Description: Convert Grey items to Money instead of mailing.
+#         Default:    true - (Converted)
+#                     false - (Mailed)
+
+AOE.LOOT.Grey.Money = true
+
+#
+###################################################################################################

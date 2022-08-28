@@ -1202,7 +1202,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void LoadCorpse(PreparedQueryResult result);
         void LoadPet();
 
-        bool AddItem(uint32 itemId, uint32 count);
+        bool AddItem(uint32 itemId, uint32 count, InventoryResult* error = nullptr);
 
         /*********************************************************/
         /***                    GOSSIP SYSTEM                  ***/
