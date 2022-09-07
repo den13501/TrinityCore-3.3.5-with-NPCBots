@@ -17,6 +17,7 @@
 
 #include "LFGMgr.h"
 #include "Common.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "DisableMgr.h"
@@ -46,6 +47,8 @@
 #include "Chat.h"
 #include "Creature.h"
 //end npcbot
+
+int8 DESERTER_CONF;
 
 namespace lfg
 {
@@ -1090,7 +1093,9 @@ void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
             grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
 
             // Add the cooldown spell if queued for a random dungeon
-            if (dungeon->type == LFG_TYPE_RANDOM)
+            //if (dungeon->type == LFG_TYPE_RANDOM)
+				DESERTER_CONF = sConfigMgr->GetIntDefault("LFG.Deserter", 1);
+				if (dungeon->type == LFG_TYPE_RANDOM && DESERTER_CONF) //LFG Deserter
                 player->CastSpell(player, LFG_SPELL_DUNGEON_COOLDOWN, false);
 
             for (GuidList::const_iterator itr2 = players.begin(); itr2 != players.end(); ++itr2)
@@ -1149,7 +1154,10 @@ void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
         {
             uint32 rDungeonId = (*dungeons.begin());
             LFGDungeonEntry const* dungeonEntry = sLFGDungeonStore.LookupEntry(rDungeonId);
-            if (dungeonEntry && dungeonEntry->TypeID == LFG_TYPE_RANDOM)
+			//LFG Deserter
+			DESERTER_CONF = sConfigMgr->GetIntDefault("LFG.Deserter", 1);
+			if (dungeonEntry && dungeonEntry->TypeID == LFG_TYPE_RANDOM && DESERTER_CONF)
+            //if (dungeonEntry && dungeonEntry->TypeID == LFG_TYPE_RANDOM)
                 player->CastSpell(player, LFG_SPELL_DUNGEON_COOLDOWN, false);
         }
     }
