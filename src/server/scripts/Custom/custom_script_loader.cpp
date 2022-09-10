@@ -63,6 +63,12 @@ void AddLfgSoloScripts();
 void AddSC_skip_StarterArea();
 void AddSolocraftScripts();
 void Add_paymaster_npc();
+void AddSC_racial_traits_npc();
+void AddSC_REFORGER_NPC();
+void AddSC_Dynamic_Resurrections();
+void AddSC_TemplateNPC();
+void AddSC_NPC_Profession();
+void AddSC_npc_1v1arena();
 
 void AddCustomScripts()
 {
@@ -110,4 +116,10 @@ void AddCustomScripts()
 	AddSC_skip_StarterArea();
 	AddSolocraftScripts();
 	Add_paymaster_npc();
+	AddSC_racial_traits_npc();
+	AddSC_REFORGER_NPC();
+	AddSC_Dynamic_Resurrections();
+	AddSC_TemplateNPC();
+	AddSC_NPC_Profession();
+	AddSC_npc_1v1arena();
 }

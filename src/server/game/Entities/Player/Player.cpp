@@ -52,6 +52,7 @@
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
+#include "DynamicResurrection.h"
 #include "Formulas.h"
 #include "GameClient.h"
 #include "GameEventMgr.h"
@@ -5180,7 +5181,22 @@ void Player::RepopAtGraveyard()
     // and don't show spirit healer location
     if (ClosestGrave)
     {
-        TeleportTo(ClosestGrave->Continent, ClosestGrave->Loc.X, ClosestGrave->Loc.Y, ClosestGrave->Loc.Z, GetOrientation(), shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
+        if (sConfigMgr->GetBoolDefault("Dynamic.Resurrections.enable", true))
+        {
+            if (sDynRes->IsInDungeonOrRaid(this) && sDynRes->CheckForSpawnPoint(this))
+            {
+                sDynRes->DynamicResurrection(this);
+            }
+            else
+            {
+                TeleportTo(ClosestGrave->Continent, ClosestGrave->Loc.X, ClosestGrave->Loc.Y, ClosestGrave->Loc.Z, GetOrientation(), shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
+            }
+        }
+        else
+        {
+            TeleportTo(ClosestGrave->Continent, ClosestGrave->Loc.X, ClosestGrave->Loc.Y, ClosestGrave->Loc.Z, GetOrientation(), shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
+        }
+
         if (isDead())                                        // not send if alive, because it used in TeleportTo()
         {
             WorldPackets::Misc::DeathReleaseLoc packet;
@@ -7705,7 +7721,21 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     ScalingStatValuesEntry const* ssv = GetScalingStatValuesFor(*proto);
     if (only_level_scale && (!ssd || !ssv))
         return;
-
+	
+	uint32 statcount = proto->StatsCount;
+    ReforgeData* reforgeData = NULL;
+    bool decreased = false;
+    if (statcount < MAX_ITEM_PROTO_STATS)
+    {
+        if (Item* invItem = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        {
+            if (reforgeMap.find(invItem->GetGUID().GetCounter()) != reforgeMap.end())
+            {
+                reforgeData = &reforgeMap[invItem->GetGUID().GetCounter()];
+                ++statcount;
+            }
+        }
+    }
     for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
     {
         uint32 statType = 0;
@@ -7720,10 +7750,24 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         }
         else
         {
-            if (i >= proto->StatsCount)
+            if (i >= statcount)
                 continue;
             statType = proto->ItemStat[i].ItemStatType;
             val = proto->ItemStat[i].ItemStatValue;
+
+            if (reforgeData)
+            {
+                if(i == statcount-1)
+                {
+                    statType = reforgeData->increase;
+                    val = reforgeData->stat_value;
+                }
+                else if (!decreased && reforgeData->decrease == statType)
+                {
+                    val -= reforgeData->stat_value;
+                    decreased = true;
+                }
+            }
         }
 
         if (val == 0)
@@ -12745,12 +12789,15 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
     }
 }
 
+extern void RemoveReforge(Player* player, uint32 itemguid, bool update);
+
 // Common operation need to remove item from inventory without delete in trade, auction, guild bank, mail....
 void Player::MoveItemFromInventory(uint8 bag, uint8 slot, bool update)
 {
     if (Item* it = GetItemByPos(bag, slot))
     {
         RemoveItem(bag, slot, update);
+		RemoveReforge(this, it->GetGUID().GetCounter(), true);
         ItemRemovedQuestCheck(it->GetEntry(), it->GetCount());
         it->SetNotRefundable(this, false);
         RemoveItemFromUpdateQueueOf(it, this);
@@ -14609,7 +14656,8 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     break;
                 case GOSSIP_OPTION_TRAINER:
                 {
-                    Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(creature->GetEntry());
+                    //Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(creature->GetEntry());
+					Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(itr->second.ActionMenuID ? itr->second.ActionMenuID : creature->GetEntry());
                     if (!trainer || !trainer->IsTrainerValidForPlayer(this))
                     {
                         TC_LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s %s requested wrong gossip menu: %u at Creature: %s (Entry: %u)",
@@ -14797,7 +14845,8 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             GetSession()->SendStablePet(guid);
             break;
         case GOSSIP_OPTION_TRAINER:
-            GetSession()->SendTrainerList(source->ToCreature());
+            //GetSession()->SendTrainerList(source->ToCreature());
+			GetSession()->SendTrainerList(source->ToCreature(), menuItemData->GossipActionMenuId);
             break;
         case GOSSIP_OPTION_LEARNDUALSPEC:
             if (GetSpecsCount() == 1 && GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
@@ -23269,12 +23318,18 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     /// SMSG_EQUIPMENT_SET_LIST
     SendEquipmentSetList();
+	
+	//Custom Speed Game
+	float speedrate = sWorld->getFloatConfig(CONFIG_SPEED_GAME);
+	uint32 speedtime = ((GameTime::GetGameTime() - GameTime::GetUptime()) + (GameTime::GetUptime() * speedrate));
 
     /// SMSG_LOGIN_SET_TIME_SPEED
-    static float const TimeSpeed = 0.01666667f;
+    //static float const TimeSpeed = 0.01666667f;
+	static float const TimeSpeed = 0.01666667f * speedrate; //Custom Speed Game
     WorldPackets::Misc::LoginSetTimeSpeed loginSetTimeSpeed;
     loginSetTimeSpeed.NewSpeed = TimeSpeed;
-    loginSetTimeSpeed.GameTime = GameTime::GetGameTime();
+    //loginSetTimeSpeed.GameTime = GameTime::GetGameTime();
+	loginSetTimeSpeed.GameTime = speedtime; //Custom Speed Game
     loginSetTimeSpeed.GameTimeHolidayOffset = 0; /// @todo
     SendDirectMessage(loginSetTimeSpeed.Write());
 

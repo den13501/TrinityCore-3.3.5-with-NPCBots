@@ -48,11 +48,16 @@
 #	 POTIONS IN COMBAT
 #	 HUNTER AMMO
 #	 CUSTOMATTACKSPEED
+#	 CUSTOMSPEEDGAME
 #	 PLAYTIMEREWARD
 #	 AOE LOOTING
 #	 TAXI SPEED
 #	 LFG DESERTER
 #	 GAINHONORONGUARDKILL
+#	 1v1
+#	 DYNAMIC RESURRECTION
+#	 TEMPLATENPC
+#	 RACIAL TRAIT SWAP
 #
 ###################################################################################################
 
@@ -5187,6 +5192,15 @@ Ammo.TakeAmmo = 1
 Custom.AttackSpeedForPlayer = 1.0
 Custom.AttackSpeedForMobs = 1.0
 #
+#############CUSTOMSPEEDGAME######################################################################
+#
+# Custom.SpeedGame
+# Set it to a number upper than 1 to speed up realm timer
+# Default : 1 (Real Time)
+# Example : 60 to force 1scde (real time) = 1 minute (realm timer)
+#
+Custom.SpeedGame = 1
+#
 ############PLAYTIMEREWARD########################################################################
 # PlayedTimeReward.Money is copper so 10000 copper is 1 gold.
 # Interval is in miliseconds. 30min = 1800000, 1 hour = 3600000
@@ -5320,7 +5334,7 @@ Custom.GainHonorOnBossKill.AreanPoints = 0
 # Default : 0 (No gold will be given )
 #
 # Min Player level Required.
-Custom.GainHonorOnGuardKill.Gold.Level = 80
+Custom.GainGoldOnKill.MinLevel = 80
 #
 Custom.GainHonorOnGuardKill.Gold = 0
 #
@@ -5335,4 +5349,111 @@ Custom.GainHonorOnEliteKill.Gold = 0
 # Default : 0 (No gold will be given )
 #
 Custom.GainHonorOnBossKill.Gold = 0
+#
+###################################################################################################
+#  1v1
+#        Arena.1v1.Enable
+#        Description: Defines is the world chat enabled or disabled, default : Enabled
+#        Usage: 0 = Disabled, 1 = Enabled
+
+Arena.1v1.Enable = 1
+
+#
+#
+#  1v1
+#        Arena.1v1.Enable
+#        Description: Gives value cost; 400000 is 40g
+#        Usage: 0-400000 // 400k is 40g
+
+Arena.1v1.Costs = 400000
+
+#
+#  1v1
+#        Arena.1v1.MinLevel
+#        Description: Change player level requirement to join 1v1 arena
+#        Usage: 1-255
+
+Arena.1v1.MinLevel = 80
+
+#
+#        Arena.1v1.BlockForbiddenTalents
+#        Description: Blocks Forbidden Talents enabled or disabled, default : Enabled
+#        Usage: 0 = Disabled, 1 = Enabled
+
+Arena.1v1.BlockForbiddenTalents = 1
+
+#
+###################################################################################################
+# Dynamic Resurrection
+#
+# Dynamic Resurrection is a simple script that add a "Resurrection Waypoint" near the latest boss
+# killed in dungeon or raid. for faster Resurrection. If 5 players or more is in a instance it will
+# be turned off to prevent abuse of instance.
+#
+#    Dynamic.Resurrection.Announce.enable
+#         Description: Announces Module when player logs in.
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+
+Dynamic.Resurrections.Announce.enable = 1
+
+#    Dynamic_Resurrections.enable
+#        Description: Enables Dynamic Resurrection
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Dynamic.Resurrections.enable = 1
+
+#
+#    Raid.Entrance.Resurrection
+#        Description: When in raids, Dynamic Reussrections resurrects players at entrance of Raids.
+#                     Then will auto teleport you back to the last boss killed when re-entering the
+#                     the Raid Map.
+#                     When Disable, it will work normally like dungeons.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Raid.Entrance.Resurrection = 1
+
+#    Dynamic.Ressurrection.Instance Health
+#         Description: Amount of Health Player Revives in % for either Dungeon or Raid Instance.
+#         Default:    0.7 - (70%) Float Values
+#                     1.0 - (100%) Float Values
+#
+#    Dungeon Health
+
+Dynamic.Ressurrection.Dungeon.Health = 0.7
+
+#    Raid Health
+
+Dynamic.Ressurrection.Raid.Health = 0.7
+
+#
+###################################################################################################
+#TEMPLATENPC
+#After changing use .templatenpc reload
+TemplateNPC.BoostCost = 250
+###################################################################################################
+#Racial Trait Swap NPC  #
+#####################################
+#
+#    Trinitycore Racial Trait NPC
+#        For a cost, you can swap our you current racial traits for that of another.
+#
+#    Trinitycore.Racial.Trait.Swap.Announce.enable
+#         Description: Announces Module when player logs in.
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+
+Trinitycore.Racial.Trait.Swap.Announce.enable = 1
+
+#
+#    Racial.Traits.Swap.Gold
+#         Description:  Cost in gold for Racial Trait Exchange.
+#         Default:    0 - (Zero Gold Free)
+#                     10 - (Ten Gold Cost)
+
+Racial.Traits.Swap.Gold = 10
+
+#
 ###################################################################################################

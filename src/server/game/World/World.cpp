@@ -1330,6 +1330,8 @@ void World::LoadConfigSettings(bool reload)
 	
 	//Taxi Speed
 	m_float_configs[CONFIG_SPEED_TAXI] = sConfigMgr->GetFloatDefault("Custom.SpeedTaxi", 1.0f);
+	//Custom Speed Game
+	m_float_configs[CONFIG_SPEED_GAME] = sConfigMgr->GetFloatDefault("Custom.SpeedGame", 1.0f);
 	
 	// Custom Attack Speed
 	m_float_configs[CONFIG_ATTACKSPEED_PLAYER] = sConfigMgr->GetFloatDefault("Custom.AttackSpeedForPlayer", 1.0f);
