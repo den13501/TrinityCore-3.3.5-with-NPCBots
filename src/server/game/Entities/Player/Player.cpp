@@ -7723,7 +7723,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (only_level_scale && (!ssd || !ssv))
         return;
 
-	uint32 statcount = proto->StatsCount;
+    uint32 statcount = proto->StatsCount;
     ReforgeData* reforgeData = NULL;
     bool decreased = false;
     if (statcount < MAX_ITEM_PROTO_STATS)
