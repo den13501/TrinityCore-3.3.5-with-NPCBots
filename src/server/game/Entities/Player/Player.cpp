@@ -7719,9 +7719,10 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
     ScalingStatDistributionEntry const* ssd = GetScalingStatDistributionFor(*proto);
     ScalingStatValuesEntry const* ssv = GetScalingStatValuesFor(*proto);
+	
     if (only_level_scale && (!ssd || !ssv))
         return;
-	
+
 	uint32 statcount = proto->StatsCount;
     ReforgeData* reforgeData = NULL;
     bool decreased = false;

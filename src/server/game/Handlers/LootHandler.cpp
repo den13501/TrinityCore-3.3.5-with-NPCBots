@@ -176,7 +176,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 		
 		if (maileditemstotal >= 1) 
 		{
-			std::string maileditems_Text =  std::to_string(maileditemstotal) + " item(s) mailed to you.";
+			std::string maileditems_Text = std::to_string(maileditemstotal) + " item(s) mailed to you.";
 			const char * mit = maileditems_Text.c_str();
 			player->GetSession()->SendAreaTriggerMessage(mit);
 		}
