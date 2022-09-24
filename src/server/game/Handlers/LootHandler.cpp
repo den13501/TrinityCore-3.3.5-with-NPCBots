@@ -178,7 +178,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 		{
 			std::string maileditems_Text = std::to_string(maileditemstotal) + " item(s) mailed to you.";
 			const char * mit = maileditems_Text.c_str();
-			player->GetSession()->SendAreaTriggerMessage(mit);
+			player->GetSession()->SendAreaTriggerMessage("%s", mit);
 		}
 				
 		if (vendeditemstotal >= 1)
@@ -247,7 +247,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 			
 			
 			const char * cft = Vend_Value_Text_Full.c_str();
-			player->GetSession()->SendAreaTriggerMessage(cft);
+			player->GetSession()->SendAreaTriggerMessage("%s", cft);
 			player->ModifyMoney(totalvendvalue);
 		}
 		
