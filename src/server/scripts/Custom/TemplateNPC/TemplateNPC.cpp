@@ -1,6 +1,7 @@
 #include "TemplateNPC.h"
 #include "Item.h"
 #include "DBCStores.h"
+#include "Language.h"
 #include "Log.h"
 #include "DatabaseEnv.h"
 #include "CharacterDatabase.h"
@@ -21,6 +22,7 @@
 #include "SpellMgr.h"
 //#include "DBCStores.h"
 #include "ObjectMgr.h"
+#include "WorldSession.h"
 
 #define BOOSTCOST "Buy level 80 and learn ALL spells - "
 #define GOLDTEXT " Gold."
