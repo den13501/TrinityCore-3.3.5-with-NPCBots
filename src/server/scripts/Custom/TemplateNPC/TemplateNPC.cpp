@@ -1103,7 +1103,7 @@ public:
     }
 
 
-    static bool HandleReloadTemplateNPCCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadTemplateNPCCommand(ChatHandler* handler)
     {
         TC_LOG_INFO("server.loading", "misc", "Reloading templates for Template NPC table...");
 		sWorld->LoadConfigSettings(true);
