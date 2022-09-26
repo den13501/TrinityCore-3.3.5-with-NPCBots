@@ -1089,14 +1089,14 @@ class TemplateNPC_command : public CommandScript
 public:
     TemplateNPC_command() : CommandScript("TemplateNPC_command") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> TemplateNPCTable =
+        static ChatCommandTable TemplateNPCTable =
         {
             { "reload", rbac::RBAC_PERM_COMMAND_RELOAD, true , &HandleReloadTemplateNPCCommand, "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "templatenpc", TemplateNPCTable },
         };
