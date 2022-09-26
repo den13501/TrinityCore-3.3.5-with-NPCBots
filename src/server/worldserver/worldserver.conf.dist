@@ -4623,10 +4623,15 @@ AutoBalance.DungeonScaleDownXP = 1
 
 #
 #     AutoBalance.DungeonsOnly
-#        Only apply scaling changes to dungeons and raids
+#        Only apply scaling changes to dungeons
 #        Default:     1 (1 = ON, 0 = OFF)
 
 AutoBalance.DungeonsOnly = 1
+
+#     AutoBalance.RaidsOnly
+#        Only apply scaling changes to Raids
+#        Default:     1 (1 = ON, 0 = OFF)
+AutoBalance.RaidsOnly = 0
 
 #
 #     AutoBalance.PlayerChangeNotify
@@ -4709,6 +4714,8 @@ AutoBalance.DisabledID = ""
 ###############
 # Enable the module? (1: true | 0: false)
 Solocraft.Enable = 1
+#Enable for Raids only?
+Solocraft.RaidsOnly = 0
 # Announce the module when the player logs in?
 Solocraft.Announce = 1
 ###################################################################################################

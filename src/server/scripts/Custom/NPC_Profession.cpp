@@ -7,11 +7,15 @@
 */
 #include "Language.h"
 #include "Chat.h"
+#include "Config.h"
 #include "DBCStores.h"
 #include "SpellMgr.h"
 #include "GossipDef.h"
+#include <numeric>
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include <string>
+#include "StringFormat.h"
 
 #define DEFAULT_MESSAGE 907
 
@@ -23,11 +27,12 @@ public:
 	struct NPC_ProfessionAI : public ScriptedAI
     {
         NPC_ProfessionAI(Creature* creature) : ScriptedAI(creature) { }     
-
-		bool PlayerAlreadyHasTwoProfessions(Player* player)
+        uint32 maxskillcount = sConfigMgr->GetIntDefault("MaxPrimaryTradeSkill", 2);
+        std::string maxamount = "Failure! You already have " + std::to_string(maxskillcount) + " professions.";
+        const char * mit = maxamount.c_str();
+		bool PlayerAlreadyHasMaxProfessions(Player* player)
 		{
 			uint32 skillCount = 0;
-		
 			if (player->HasSkill(SKILL_MINING))
 				skillCount++;
 			if (player->HasSkill(SKILL_SKINNING))
@@ -35,7 +40,7 @@ public:
 			if (player->HasSkill(SKILL_HERBALISM))
 				skillCount++;
 		
-			if (skillCount >= 2)
+			if (skillCount >= maxskillcount)
 				return true;
 		
 			for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
@@ -54,7 +59,7 @@ public:
 				if (player->HasSkill(skillID))
 					skillCount++;
 		
-				if (skillCount >= 2)
+				if (skillCount >= maxskillcount)
 					return true;
 			}
 		
@@ -129,8 +134,8 @@ public:
 		
 		void CompleteLearnProfession(Player* player, /*Creature* creature,*/ SkillType skill)
 		{
-			if ((PlayerAlreadyHasTwoProfessions(player)) && (!IsSecondarySkill(skill)))
-				ChatHandler(player->GetSession()).PSendSysMessage("Failure! You already have two professions.");
+			if ((PlayerAlreadyHasMaxProfessions(player)) && (!IsSecondarySkill(skill)))
+				ChatHandler(player->GetSession()).PSendSysMessage(mit);
 			else
 			{
 				if (!LearnAllRecipesInProfession(player, skill))
@@ -156,7 +161,8 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface\\icons\\trade_mining:30|t Mining.", GOSSIP_SENDER_MAIN, 11);
 			AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface\\icons\\inv_misc_food_15:30|t Cooking", GOSSIP_SENDER_MAIN, 12);
 			AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface\\icons\\Spell_Holy_SealOfSacrifice:30|t First Aid", GOSSIP_SENDER_MAIN, 13);
-			AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\spell_chargenegative:30|t Nevermind!", GOSSIP_SENDER_MAIN, 14);
+			AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface\\icons\\Inv_fishingpole_02:30|t Fishing", GOSSIP_SENDER_MAIN, 14);
+			AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface\\icons\\spell_chargenegative:30|t Nevermind!", GOSSIP_SENDER_MAIN, 15);
 			SendGossipMenuFor(player, DEFAULT_MESSAGE, me->GetGUID());
 			return true;
 		}
@@ -314,7 +320,19 @@ public:
 				CompleteLearnProfession(player, SKILL_FIRST_AID);
 				CloseGossipMenuFor(player);;
 				break;
+		
 			case 14:
+				if (player->HasSkill(SKILL_FISHING))
+				{
+					CloseGossipMenuFor(player);
+					return false;
+				}
+		
+				CompleteLearnProfession(player, SKILL_FISHING);
+				CloseGossipMenuFor(player);;
+				break;
+		
+			case 15:
 				CloseGossipMenuFor(player);;
 				break;
 			

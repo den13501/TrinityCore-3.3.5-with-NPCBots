@@ -38,6 +38,7 @@
 
 bool SoloCraftEnable = 1;
 bool SoloCraftAnnounceModule = 1;
+bool SoloCraftRaidsOnly = 1;
 bool SoloCraftDebuffEnable = 1;
 float SoloCraftSpellMult = 1.0;
 float SoloCraftStatsMult = 100.0;
@@ -62,6 +63,7 @@ public:
     void OnConfigLoad(bool /*reload*/) override
     {
         SoloCraftEnable = sConfigMgr->GetBoolDefault("Solocraft.Enable", 1);
+		SoloCraftRaidsOnly = sConfigMgr->GetBoolDefault("Solocraft.RaidsOnly", 1);
         SoloCraftAnnounceModule = sConfigMgr->GetBoolDefault("Solocraft.Announce", 1);
         //Balancing
         SoloCraftDebuffEnable = sConfigMgr->GetBoolDefault("SoloCraft.Debuff.Enable", 1);
@@ -333,7 +335,10 @@ public:
             int dunLevel = CalculateDungeonLevel(map, player);
             int numInGroup = GetNumInGroup(player);
             uint32 classBalance = GetClassBalance(player);
+			if ((sConfigMgr->GetBoolDefault("Solocraft.RaidsOnly", true) && map->IsRaid()) || !sConfigMgr->GetBoolDefault("Solocraft.RaidsOnly", true))
+			{
             ApplyBuffs(player, map, difficulty, dunLevel, numInGroup, classBalance);
+			}
         }
     }
 
