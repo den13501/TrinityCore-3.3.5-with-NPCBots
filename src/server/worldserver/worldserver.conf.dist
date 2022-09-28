@@ -58,6 +58,7 @@
 #	 DYNAMIC RESURRECTION
 #	 TEMPLATENPC
 #	 RACIAL TRAIT SWAP
+# 	 ALL CLASSES TAME
 #
 ###################################################################################################
 
@@ -5463,4 +5464,10 @@ Trinitycore.Racial.Trait.Swap.Announce.enable = 1
 Racial.Traits.Swap.Gold = 10
 
 #
+###################################################################################################
+###ALL CLASSES TAME###
+#All classes can use tame. 
+#	The lua_script "TameBeast_AllClasses.lua" will give players taming spells at
+#	certain levels if "local enabled = false" is set to true
+Tame.All.Enabled = false
 ###################################################################################################

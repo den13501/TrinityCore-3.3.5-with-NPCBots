@@ -115,6 +115,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <string>
 #include "StringFormat.h"
 #include <numeric>
 #ifdef ELUNA
@@ -1577,7 +1578,8 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     CreatureFamily petFamily = CREATURE_FAMILY_NONE;
 
     // show pet at selection character in character list only for non-ghost character
-    if (result && !(playerFlags & PLAYER_FLAGS_GHOST) && (plrClass == CLASS_WARLOCK || plrClass == CLASS_HUNTER || plrClass == CLASS_DEATH_KNIGHT))
+    //if (result && !(playerFlags & PLAYER_FLAGS_GHOST) && (plrClass == CLASS_WARLOCK || plrClass == CLASS_HUNTER || plrClass == CLASS_DEATH_KNIGHT))
+		if (result && !(playerFlags & PLAYER_FLAGS_GHOST))
     {
         uint32 entry = fields[19].GetUInt32();
         CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(entry);
@@ -16914,6 +16916,8 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 								std::ostringstream ss2;
 								float amount;
 
+						if (killed != nullptr)
+						{
 						if (Creature* victim = killed->ToCreature())
 							{
 										int nonbossroll = irand(1, 100);
@@ -17045,9 +17049,8 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 
 							}
 					}
-
-
-    }
+						}
+						}
 
 }
 
@@ -27447,26 +27450,59 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
             pet->SetPetNameTimestamp(uint32(GameTime::GetGameTime())); // cast can't be helped in this case
             break;
+		case HUNTER_PET:
+			pet->SetPowerType(POWER_FOCUS);
+			pet->SetPower(POWER_HAPPINESS, 1048000);
+			pet->SetClass(CLASS_WARRIOR);
+			pet->SetGender(GENDER_NONE);
+			pet->SetSheath(SHEATH_STATE_MELEE);
+			pet->ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED); // this enables popup window (pet abandon, cancel)
         default:
             break;
     }
 
     map->AddToMap(pet->ToCreature());
 
-    ASSERT(!petStable.CurrentPet && (petType != HUNTER_PET || !petStable.GetUnslottedHunterPet()));
+   ASSERT(!petStable.CurrentPet && (petType != HUNTER_PET || !petStable.GetUnslottedHunterPet()));
     pet->FillPetInfo(&petStable.CurrentPet.emplace());
 
-    switch (petType)
-    {
-        case SUMMON_PET:
-            pet->InitPetCreateSpells();
-            pet->InitTalentForLevel();
-            pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-            PetSpellInitialize();
-            break;
-        default:
-            break;
-    }
+    //skuly Tame All
+if (sConfigMgr->GetBoolDefault("Tame.All.Enabled", true))
+{
+	
+		switch (petType)
+		{
+			case SUMMON_PET:
+				pet->InitPetCreateSpells();
+				pet->InitTalentForLevel();
+				pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+				PetSpellInitialize();
+				break;
+			case HUNTER_PET:
+				pet->InitPetCreateSpells();
+				pet->InitTalentForLevel();
+				PetSpellInitialize();
+				break;
+			default:
+				break;
+		}
+}
+	else
+	{
+		
+		switch (petType)
+		{
+			case SUMMON_PET:
+				pet->InitPetCreateSpells();
+				pet->InitTalentForLevel();
+				pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+				PetSpellInitialize();
+				break;
+			default:
+				break;
+		}
+		
+	}
 
     if (petType == SUMMON_PET)
     {
@@ -27483,6 +27519,15 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
                 ++itr;
         }
     }
+
+    //skuly Tame All
+	if (sConfigMgr->GetBoolDefault("Tame.All.Enabled", true))
+	{
+		if (petType == HUNTER_PET)
+		{
+			SetPowerType(POWER_FOCUS);
+		}
+	}
 
     if (duration > 0)
         pet->SetDuration(duration);
