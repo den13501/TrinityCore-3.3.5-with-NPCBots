@@ -3022,7 +3022,7 @@ void Spell::EffectTameCreature()
 		if ((sConfigMgr->GetBoolDefault("Tame.All.Enabled", true)) && unitTarget->GetClass() != CLASS_HUNTER)
 		{
 		pet->SetPowerType(POWER_FOCUS);
-		pet->SetPower(POWER_HAPPINESS, 1048000);
+		pet->SetPower(POWER_HAPPINESS, 0);
 		pet->SetClass(CLASS_WARRIOR);
         pet->SetGender(GENDER_NONE);
         pet->SetSheath(SHEATH_STATE_MELEE);

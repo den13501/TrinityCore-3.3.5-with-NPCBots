@@ -1407,6 +1407,92 @@ void Player::Update(uint32 p_time)
     if (_botMgr)
         _botMgr->Update(p_time);
     //end Npcbot
+	
+	//skuly Tame All
+		if (sConfigMgr->GetBoolDefault("Tame.All.Enabled", true))
+	  {
+	  	uint8 playerlevel = GetLevel();
+		uint8 spellslevel = sConfigMgr->GetIntDefault("Tame.All.level", 10);
+	  	if (GetClass() != CLASS_HUNTER && !HasSpell(1515))
+	  	{
+			
+		 if (playerlevel >= spellslevel)
+		 {
+	  		LearnSpell(1515, true);
+	  		LearnSpell(883, true);	// Call Pet
+            LearnSpell(982, true);	// Revive Pet
+            LearnSpell(264, true);	// Dismiss Pet
+            LearnSpell(6991, true);	// Feed Pet
+            LearnSpell(136, true);// Mend Pet	
+            LearnSpell(1002, true);	// Eyes of the Beast
+            LearnSpell(1462, true);	// Beast Lore
+            LearnSpell(6197, true);	// Eagle Eye
+			LearnSpell(53270, true);	// Beast Mastery
+		 }
+	  	}
+		if (GetClass() != CLASS_HUNTER && (playerlevel >= spellslevel) && HasSpell(1515) )
+		{	
+			if (playerlevel >= 20 && !HasSpell(3111))
+			{LearnSpell(3111, true);}
+            if (playerlevel >= 28 && !HasSpell(3661))
+			{LearnSpell(3661, true);}
+            if (playerlevel >= 30 && !HasSpell(19577))
+			{LearnSpell(19577, true);}
+            if (playerlevel >= 36 && !HasSpell(3662))
+			{LearnSpell(3662, true);}
+            if (playerlevel >= 40 && !HasSpell(19574))
+			{LearnSpell(19574, true);}
+            if (playerlevel >= 44 && !HasSpell(13542))
+			{LearnSpell(13542, true);}
+            if (playerlevel >= 52 && !HasSpell(13543))
+			{LearnSpell(13543, true);}
+            if (playerlevel >= 60 && !HasSpell(13544))
+			{LearnSpell(13544, true);}
+            if (playerlevel >= 66 && !HasSpell(34026))
+			{LearnSpell(34026, true);}
+            if (playerlevel >= 68 && !HasSpell(27046))
+			{LearnSpell(27046, true);}
+            if (playerlevel >= 74 && !HasSpell(48989))
+			{LearnSpell(48989, true);}
+            if (playerlevel >= 80 && !HasSpell(62757))
+			{
+			  LearnSpell(48990, true);
+		      LearnSpell(62757, true);
+		    }
+		}
+		
+	  }
+	  
+	  if (!sConfigMgr->GetBoolDefault("Tame.All.Enabled", true))
+	  {
+		 if (GetClass() != CLASS_HUNTER && HasSpell(1515))
+	  	{
+			RemoveSpell(1515, true);
+			RemoveSpell(883, true);
+			RemoveSpell(982, true);
+			RemoveSpell(264, true);
+			RemoveSpell(6991, true);
+			RemoveSpell(136, true);
+			RemoveSpell(1002, true);
+			RemoveSpell(1462, true);
+			RemoveSpell(6197, true);
+			RemoveSpell(53270, true);
+			RemoveSpell(3111, true);
+			RemoveSpell(3661, true);
+			RemoveSpell(19577, true);
+			RemoveSpell(3662, true);
+			RemoveSpell(19574, true);
+			RemoveSpell(13542, true);
+			RemoveSpell(13543, true);
+			RemoveSpell(13544, true);
+			RemoveSpell(34026, true);
+			RemoveSpell(27046, true);
+			RemoveSpell(48989, true);
+			RemoveSpell(48990, true);
+			RemoveSpell(62757, true);
+		}
+		  
+	  }
 }
 
 void Player::setDeathState(DeathState s)
@@ -3039,6 +3125,8 @@ QueryResult Dungeonstatsresult = CharacterDatabase.PQuery("SELECT `Strength`, `A
 }
 
 		}
+		
+		
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
@@ -24530,6 +24618,24 @@ bool Player::GetsRecruitAFriendBonus(bool forXP)
 void Player::RewardPlayerAndGroupAtKill(Unit* victim, bool isBattleGround)
 {
     KillRewarder(this, victim, isBattleGround).Reward();
+	
+	//skuly Tame All
+	if (sConfigMgr->GetBoolDefault("Tame.All.Enabled", true))
+	{
+		Pet* pet = GetPet();
+		if (GetClass() != CLASS_HUNTER && pet->getPetType() == HUNTER_PET)
+		{
+			uint8 playerlevel = GetLevel();
+			uint8 petlevel = pet->GetLevel();
+			uint32 curhappy = pet->GetPower(POWER_HAPPINESS);
+			
+			if (petlevel < playerlevel)
+			{
+				pet->SetLevel(playerlevel);
+			}
+			pet->SetPower(POWER_HAPPINESS, curhappy+50000);
+		}
+	}
 }
 
 void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewardSource)
@@ -27455,7 +27561,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             break;
 		case HUNTER_PET:
 			pet->SetPowerType(POWER_FOCUS);
-			pet->SetPower(POWER_HAPPINESS, 1048000);
+			pet->SetPower(POWER_HAPPINESS, 0);
 			pet->SetClass(CLASS_WARRIOR);
 			pet->SetGender(GENDER_NONE);
 			pet->SetSheath(SHEATH_STATE_MELEE);
@@ -27529,6 +27635,7 @@ if (sConfigMgr->GetBoolDefault("Tame.All.Enabled", true))
 		if (petType == HUNTER_PET)
 		{
 			SetPowerType(POWER_FOCUS);
+			SetPower(POWER_HAPPINESS, 0);
 		}
 	}
 

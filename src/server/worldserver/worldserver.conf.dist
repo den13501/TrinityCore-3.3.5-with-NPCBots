@@ -5467,7 +5467,11 @@ Racial.Traits.Swap.Gold = 10
 ###################################################################################################
 ###ALL CLASSES TAME###
 #All classes can use tame. 
-#	The lua_script "TameBeast_AllClasses.lua" will give players taming spells at
-#	certain levels if "local enabled = false" is set to true
+# Enable Taming for all classes
+# Pets start with 0 happiness and gain it from kills. Takes 20 kills to have full happyiness.
+# Tpye .pethappy ingame to se you pets happieness value
 Tame.All.Enabled = false
+#
+# What level to give Tame,Call,Dismiss,Mend spells.
+Tame.All.level = 10
 ###################################################################################################

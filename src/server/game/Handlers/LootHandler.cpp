@@ -332,7 +332,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         case HighGuid::Vehicle:
         {
             Creature* creature = player->GetMap()->GetCreature(guid);
-            bool lootAllowed = creature && creature->IsAlive() == (player->GetClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+            //bool lootAllowed = creature && creature->IsAlive() == (player->GetClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+			bool lootAllowed = creature && creature->IsAlive() == (creature->loot.loot_type == LOOT_PICKPOCKETING);
             if (lootAllowed && creature->IsWithinDistInMap(player, INTERACTION_DISTANCE))
             {
                 loot = &creature->loot;
@@ -560,7 +561,8 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     {
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-        bool lootAllowed = creature && creature->IsAlive() == (player->GetClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+        //bool lootAllowed = creature && creature->IsAlive() == (player->GetClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+		bool lootAllowed = creature && creature->IsAlive() == (creature->loot.loot_type == LOOT_PICKPOCKETING);
         if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
             return;
 
