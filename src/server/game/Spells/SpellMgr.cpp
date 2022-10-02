@@ -4954,7 +4954,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 		if (sConfigMgr->GetBoolDefault("Tame.Instant", true))
 		{
 		spellInfo->AttributesEx5 |= SPELL_ATTR5_START_PERIODIC_AT_APPLY;
-		//spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(5); //2000ms 
 		}
     });
 

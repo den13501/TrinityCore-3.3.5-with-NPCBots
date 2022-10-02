@@ -2960,17 +2960,6 @@ void Spell::EffectTameCreature()
 
     Unit* unitCaster = GetUnitCasterForEffectHandlers();
 
-	//skuly Tame All
-    if (unitCaster->GetClass() != CLASS_HUNTER && !sConfigMgr->GetBoolDefault("Tame.All.Enabled", true))
-    {
-        unitCaster->ToPlayer()->GetSession()->SendAreaTriggerMessage("All Classes tame is not enabled so only Hunters can use Tame Beast!");
-
-		if (unitCaster->ToPlayer()->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
-		{
-			unitCaster->ToPlayer()->GetSession()->SendAreaTriggerMessage("Set Tame.All.Enabled = true in Worldserver.conf");
-		}
-        return;
-    }
 
     if (!unitCaster || unitCaster->GetPetGUID())
         return;
@@ -2986,8 +2975,8 @@ void Spell::EffectTameCreature()
     if (creatureTarget->IsPet())
         return;
 
-   //if (unitCaster->GetClass() != CLASS_HUNTER)
-        //return;
+   if (unitCaster->GetClass() != CLASS_HUNTER)
+        return;
 
     // cast finish successfully
     //SendChannelUpdate(0);
@@ -3018,19 +3007,9 @@ void Spell::EffectTameCreature()
 
     if (unitCaster->GetTypeId() == TYPEID_PLAYER)
     {
-		//skuly Tame All
-		if ((sConfigMgr->GetBoolDefault("Tame.All.Enabled", true)) && unitTarget->GetClass() != CLASS_HUNTER)
-		{
-		pet->SetPowerType(POWER_FOCUS);
-		pet->SetPower(POWER_HAPPINESS, 0);
-		pet->SetClass(CLASS_WARRIOR);
-        pet->SetGender(GENDER_NONE);
-        pet->SetSheath(SHEATH_STATE_MELEE);
-        pet->ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED); // this enables popup window (pet abandon, cancel)
-		}
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         unitCaster->ToPlayer()->PetSpellInitialize();
-    }
+	}
 }
 
 void Spell::EffectSummonPet()
@@ -5307,11 +5286,11 @@ void Spell::EffectActivateRune()
 
 void Spell::EffectCreateTamedPet()
 {
+	PetType petType = MAX_PET_TYPE;
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    //if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER || unitTarget->GetPetGUID() || unitTarget->GetClass() != CLASS_HUNTER)
-		if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER || unitTarget->GetPetGUID())
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER || unitTarget->GetPetGUID() || unitTarget->GetClass() != CLASS_HUNTER)
         return;
 
     uint32 creatureEntry = effectInfo->MiscValue;
@@ -5329,16 +5308,6 @@ void Spell::EffectCreateTamedPet()
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
     {
-		//skuly Tame All
-		if ((sConfigMgr->GetBoolDefault("Tame.All.Enabled", true)) && unitTarget->GetClass() != CLASS_HUNTER)
-		{
-		pet->SetPowerType(POWER_FOCUS);
-		pet->SetPower(POWER_HAPPINESS, 1048000);
-		pet->SetClass(CLASS_WARRIOR);
-        pet->SetGender(GENDER_NONE);
-        pet->SetSheath(SHEATH_STATE_MELEE);
-        pet->ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED); // this enables popup window (pet abandon, cancel)
-		}
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         unitTarget->ToPlayer()->PetSpellInitialize();
     }
