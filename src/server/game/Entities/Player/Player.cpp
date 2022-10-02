@@ -27455,6 +27455,8 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
             pet->SetPetNameTimestamp(uint32(GameTime::GetGameTime())); // cast can't be helped in this case
             break;
+		default:
+            break;
     }
 
     map->AddToMap(pet->ToCreature());
