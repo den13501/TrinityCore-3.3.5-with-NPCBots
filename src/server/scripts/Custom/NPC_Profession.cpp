@@ -12,6 +12,7 @@
 #include "SpellMgr.h"
 #include "GossipDef.h"
 #include <numeric>
+#include "Player.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include <string>
@@ -84,13 +85,98 @@ public:
 
 			if (!SkillInfo)
 				return false;
-		
-			LearnSkillRecipesHelper(player, SkillInfo->ID);
-		
-			player->SetSkill(SkillInfo->ID, player->GetSkillStep(SkillInfo->ID), 450, 450);
-			ChatHandler(player->GetSession()).PSendSysMessage(LANG_COMMAND_LEARN_ALL_RECIPES, skill_name);
+			
+			if (sConfigMgr->GetBoolDefault("ProfessionNPC.Max", true))
+			{
+			
+				player->SetSkill(SkillInfo->ID, player->GetSkillStep(SkillInfo->ID), 450, 450);
+				LearnSkillRecipesHelper(player, SkillInfo->ID);
+				ChatHandler(player->GetSession()).PSendSysMessage(LANG_COMMAND_LEARN_ALL_RECIPES, skill_name);
+			}
+			else
+			{
+				
+				player->SetSkill(SkillInfo->ID, player->GetSkillStep(SkillInfo->ID), 1, 75);
+				LearnApprentice(player, skill);
+			}
+
 		
 			return true;
+		}
+		
+		void LearnApprentice(Player* player, SkillType skill)
+		{
+			if (skill == SKILL_ALCHEMY)
+			{
+				player->LearnSpell(2259, false);
+			}
+			
+			if (skill == SKILL_BLACKSMITHING)
+			{
+				player->LearnSpell(2018, false);
+			}
+			
+			if (skill == SKILL_COOKING)
+			{
+				player->LearnSpell(2550, false);
+			}
+			
+			if (skill == SKILL_ENCHANTING)
+			{
+				player->LearnSpell(7411, false);
+			}
+			
+			if (skill == SKILL_ENGINEERING)
+			{
+				player->LearnSpell(4036, false);
+			}
+			
+			if (skill == SKILL_FIRST_AID)
+			{
+				player->LearnSpell(3273, false);
+			}
+			
+			if (skill == SKILL_FISHING)
+			{
+				player->LearnSpell(7620, false);
+			}
+			
+			if (skill == SKILL_HERBALISM)
+			{
+				player->LearnSpell(2366, false);
+			}
+			
+			if (skill == SKILL_INSCRIPTION)
+			{
+				player->LearnSpell(45357, false);
+			}
+			
+			if (skill == SKILL_JEWELCRAFTING)
+			{
+				player->LearnSpell(25229, false);
+			}
+			
+			if (skill == SKILL_LEATHERWORKING)
+			{
+				player->LearnSpell(2108, false);
+			}
+			
+			if (skill == SKILL_MINING)
+			{
+				player->LearnSpell(2575, false);
+			}
+			
+			if (skill == SKILL_SKINNING)
+			{
+				player->LearnSpell(8613, false);
+			}
+			
+			if (skill == SKILL_TAILORING)
+			{
+				player->LearnSpell(3908, false);
+			}
+			
+
 		}
 		
 		void LearnSkillRecipesHelper(Player* player, uint32 skillId)
@@ -123,13 +209,17 @@ public:
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, player, false))
                 continue;
 
-            player->LearnSpell(skillLine->Spell, false);
+			player->LearnSpell(skillLine->Spell, false);
+			
+
         }
-    }
 		
+		
+    }
+	
 		bool IsSecondarySkill(SkillType skill)
 		{
-			return skill == SKILL_COOKING || skill == SKILL_FIRST_AID;
+			return skill == SKILL_COOKING || skill == SKILL_FIRST_AID || skill == SKILL_FISHING;
 		}
 		
 		void CompleteLearnProfession(Player* player, /*Creature* creature,*/ SkillType skill)

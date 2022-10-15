@@ -58,6 +58,8 @@
 #	 DYNAMIC RESURRECTION
 #	 TEMPLATENPC
 #	 RACIAL TRAIT SWAP
+#	 INSTANT TAME
+#	 PROFESSIONNPC
 #
 ###################################################################################################
 
@@ -5467,5 +5469,11 @@ Racial.Traits.Swap.Gold = 10
 #INSTANT TAME
 # Tame beast psell is instant.
 Tame.Instant = true
+#
+###################################################################################################
+#PROFESSIONNPC
+#	If false then you start as Apprentice with skill 1/75
+#		with true you learn all recipes/spells and are max skill 450/450
+ProfessionNPC.Max = false
 #
 ###################################################################################################
