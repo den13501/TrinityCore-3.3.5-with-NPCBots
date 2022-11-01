@@ -5168,11 +5168,14 @@ DungeonStatsReward.Chance = 100
 #
 #Random 1-# (Default 5) would give 1-5 points of the stat.
 #
-DungeonStatsReward.AmountBoss  = 5
+DungeonStatsReward.MinAmountBoss  = 1
+DungeonStatsReward.MaxAmountBoss = 5
 #
-DungeonStatsReward.AmountElite  = 5
+DungeonStatsReward.MinAmountElite  = 1
+DungeonStatsReward.MaxAmountElite  = 5
 #
-DungeonStatsReward.AmountNormal = 1
+DungeonStatsReward.MinAmountNormal = 1
+DungeonStatsReward.MaxAmountNormal = 5
 #
 #Pets will also get the points player gained
 DungeonStatsReward.Pets  = true

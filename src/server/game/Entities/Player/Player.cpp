@@ -16918,7 +16918,8 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 								bool const isDungeon = sMapStore.LookupEntry(GetMapId())->IsDungeon();
 								std::ostringstream ss;
 								std::ostringstream ss2;
-								float amount;
+								float minamount;
+                                float maxamount;
 
 						if (killed != nullptr)
 						{
@@ -16944,25 +16945,29 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 										{
 										QueryResult GDungeonstatsresult = CharacterDatabase.PQuery("SELECT `Strength`, `Agility`, `Stamina`, `Intellect`, `Spirit`, `SpellPower`, `AttackPower`, `RAttackPower` FROM `stats_from_dungeons` WHERE `GUID` = %u", GetGUID());
 
-										if (victim->isElite())
+										if (victim->IsDungeonBoss())
 										{
-										amount = sConfigMgr->GetFloatDefault("DungeonStatsReward.AmountElite", 1.0f);
+										minamount = sConfigMgr->GetFloatDefault("DungeonStatsReward.MinAmountBoss", 1.0f);
+										maxamount = sConfigMgr->GetFloatDefault("DungeonStatsReward.MaxAmountBoss", 1.0f);
 										}
-										else if (victim->IsDungeonBoss())
+										else if (victim->isElite())
 										{
-										amount = sConfigMgr->GetFloatDefault("DungeonStatsReward.AmountBoss", 1.0f);
+										minamount = sConfigMgr->GetFloatDefault("DungeonStatsReward.MinAmountElite", 1.0f);
+										maxamount = sConfigMgr->GetFloatDefault("DungeonStatsReward.MaxAmountElite", 1.0f);
 										}
 										else
 										{
-										amount = sConfigMgr->GetFloatDefault("DungeonStatsReward.AmountNormal", 1.0f);
+										minamount = sConfigMgr->GetFloatDefault("DungeonStatsReward.MinAmountNormal", 1.0f);
+										maxamount = sConfigMgr->GetFloatDefault("DungeonStatsReward.MaxAmountNormal", 1.0f);
 										}
 
-										if (amount < 1.0f)
+										if (maxamount < 1.0f)
 										{
-											amount = 1.0f;
+											maxamount = 1.0f;
 										}
+										
 										int memberguid = GetGUID();
-										float Rollpoints = irand(1.0f, amount );
+										float Rollpoints = irand(minamount, maxamount );
 
 										int chatpoints = int(Rollpoints);
 
@@ -17046,7 +17051,6 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
 											{
 											{CharacterDatabase.DirectPExecute("UPDATE `stats_from_dungeons` SET %s = %f WHERE GUID = %u", statchosen, DBValue + Rollpoints, memberguid);}
 											}
-											
 											ChatHandler(GetSession()).PSendSysMessage(ss.str().c_str(), chatpoints);
 										}
 
